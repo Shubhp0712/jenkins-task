@@ -1,0 +1,58 @@
+node('ec2-worker'){
+    properties([
+        parameters([
+            gitParameter(type: 'PT_BRANCH',
+                         name: 'A_BRANCH',
+                         branchFilter: 'origin/(.*)',
+                         defaultValue: 'main',
+                         description: 'Choose a branch for checkout',
+                         selectedValue: 'TOP',
+                         sortMode: 'ASCENDING_SMART'),
+            booleanParam(
+                name: 'Deploy', 
+                defaultValue: false, 
+                description: 'Check this box to deploy code otherwise it runs to testing phase.'
+        )
+    ])
+])
+
+    stage("chekout"){
+        git url: 'https://github.com/Shubhp0712/jenkins-task.git', branch: params.A_BRANCH
+    }
+
+    stage("Build app and check Requied dependency"){
+        nodejs(nodeJSInstallationName: 'Nodejs-installation'){
+            stage("Check for dependency"){
+                sh 'node -v'
+                sh 'npm -v'
+            }
+            
+            stage("Install pm2"){
+                echo "install pm2"
+                sh 'npm install pm2 -g'
+            }
+
+            stage("Run app"){
+                withEnv(["GIT_BRANCH=${params.A_BRANCH}", "JENKINS_NODE_COOKIE=dontKillMe"]){
+                    echo "Run the Node app"
+                    sh "pm2 delete my-app || true && pm2 start server.js --name 'my-app'"
+                    echo "App has started"
+                }
+            }
+        }
+    }
+
+    stage("Testing"){
+        if(params.Deploy == false){
+            currentBuild.result = 'ABORTED'
+            echo "This is testing phase and Pipeline has been stopped now."
+            error("Stopping pipeline early.")
+        }
+
+        echo "Tesing stage"
+    }
+    
+    stage("Deploy"){
+        echo "Deploy phase"
+    }
+}
