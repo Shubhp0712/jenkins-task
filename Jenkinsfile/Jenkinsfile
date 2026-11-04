@@ -26,7 +26,6 @@ node('ec2-worker'){
             stage("Check for dependency"){
                 sh 'node -v'
                 sh 'npm -v'
-                sh 'git rev-parse --abbrev-ref HEAD'
             }
             
             stage("Install pm2"){
