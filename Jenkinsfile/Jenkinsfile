@@ -18,6 +18,7 @@ node('ec2-worker'){
 
     stage("chekout"){
         git url: 'https://github.com/Shubhp0712/jenkins-task.git', branch: params.A_BRANCH
+        echo "${params.A_BRANCH}"
     }
 
     stage("Build app and check Requied dependency"){
