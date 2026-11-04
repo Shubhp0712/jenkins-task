@@ -17,7 +17,13 @@ node('ec2-worker'){
 ])
 
     stage("chekout"){
-        git url: 'https://github.com/Shubhp0712/jenkins-task.git', branch: params.A_BRANCH
+        cleanWs()
+        def targetBranch = env.GIT_BRANCH ?: params.A_BRANCH
+        if (targetBranch.contains('origin/')) {
+                targetBranch = targetBranch.replace('origin/', '')
+            }
+        git url: 'https://github.com/Shubhp0712/jenkins-task.git', branch: targetBranch
+        echo "${targetBranch}"
     }
 
     stage("Build app and check Requied dependency"){
