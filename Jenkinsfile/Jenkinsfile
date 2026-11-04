@@ -16,7 +16,7 @@ node('ec2-worker'){
     ])
 ])
 
-    stage("Chekout"){
+    stage("chekout"){
         git url: 'https://github.com/Shubhp0712/jenkins-task.git', branch: params.A_BRANCH
     }
 
