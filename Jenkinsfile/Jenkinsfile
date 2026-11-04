@@ -47,7 +47,7 @@ node('ec2-worker'){
             }
 
             stage("Run app"){
-                withEnv(["GIT_BRANCH=${params.A_BRANCH}", "JENKINS_NODE_COOKIE=dontKillMe"]){
+                withEnv(["GIT_BRANCH=${env.SELECTED_BRANCH}", "JENKINS_NODE_COOKIE=dontKillMe"]){
                     echo "Run the Node app"
                     sh "pm2 delete my-app || true && pm2 start server.js --name 'my-app'"
                     echo "App has started"
