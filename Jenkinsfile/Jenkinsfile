@@ -34,18 +34,26 @@ node('ec2-worker'){
         env.SELECTED_BRANCH = targetBranch
     }
 
-    stage("Build app and check Requied dependency"){
-        nodejs(nodeJSInstallationName: 'Nodejs-installation'){
-            stage("Check for dependency"){
-                sh 'node -v'
-                sh 'npm -v'
-            }
+    nodejs(nodeJSInstallationName: 'Nodejs-installation'){
+        stage("Check for dependency"){
+            sh 'node -v'
+            sh 'npm -v'
+        }
             
-            stage("Install pm2"){
-                echo "install pm2"
-                sh 'npm install pm2 -g'
-            }
+        stage("Install pm2"){
+            echo "install pm2"
+            sh 'npm install pm2 -g'
+        }
+        stage("Testing"){
+            echo "Tesing stage"
+            sh 'node -c server.js'
+            echo "Testing phase completed successfully."
+        }
 
+        if(params.Deploy != false){
+            stage("Deploy"){
+                echo "Deploy phase"
+            }
             stage("Run app"){
                 withEnv(["GIT_BRANCH=${env.SELECTED_BRANCH}", "JENKINS_NODE_COOKIE=dontKillMe"]){
                     echo "Run the Node app"
@@ -53,20 +61,9 @@ node('ec2-worker'){
                     echo "App has started"
                 }
             }
+            stage("pipeline completion"){
+                echo "pipeline completed successfully."
+            }
         }
-    }
-
-    stage("Testing"){
-        if(params.Deploy == false){
-            currentBuild.result = 'ABORTED'
-            echo "This is testing phase and Pipeline has been stopped now."
-            error("Stopping pipeline early.")
-        }
-
-        echo "Tesing stage"
-    }
-    
-    stage("Deploy"){
-        echo "Deploy phase"
     }
 }
