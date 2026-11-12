@@ -10,7 +10,7 @@ node('ec2-worker'){
                          sortMode: 'ASCENDING_SMART'),
             booleanParam(
                 name: 'Deploy', 
-                defaultValue: false, 
+                defaultValue: true, 
                 description: 'Check this box to deploy code otherwise it runs to testing phase.'
         )
     ])
